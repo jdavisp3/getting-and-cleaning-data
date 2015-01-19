@@ -1,7 +1,6 @@
 # Clean the Smartphone data
 
 data_dir <- 'UCI HAR Dataset'
-features_file <- file.path(data_dir, 'features.txt')
 
 get_activities <- function() {
   activity_labels_file <- file.path(data_dir, 'activity_labels.txt')
@@ -9,4 +8,11 @@ get_activities <- function() {
   factor(activity_data$V1, labels=activity_data$V2)
 }
 
+get_features <- function() {
+  features_file <- file.path(data_dir, 'features.txt')
+  features_data <- read.csv(features_file, header=FALSE, sep=' ', stringsAsFactors = FALSE)
+  matrix(features[,2])
+}
+
 activities <- get_activities()
+features <- get_features()
