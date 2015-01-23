@@ -27,7 +27,7 @@ clean_feature_name <- function(feature) {
   chartr('-,', '..', no_rparens)
 }
 
-load_data_set <- function(set_name) {
+load_data_set <- function(set_name, nrows=-1) {
   dataset_dir <- file.path(data_dir, set_name)
 
   get_data_file_name <- function(data_type) {
@@ -35,7 +35,7 @@ load_data_set <- function(set_name) {
   }
 
   subject_file <- file.path(dataset_dir, get_data_file_name('subject'))
-  subject_data <- read.csv(subject_file, header=FALSE, stringsAsFactors=FALSE)
+  subject_data <- read.csv(subject_file, header=FALSE, stringsAsFactors=FALSE, nrows=nrows)
   subject_data <- tbl_df(subject_data)
   colnames(subject_data) <- c('subject')
 
@@ -43,19 +43,19 @@ load_data_set <- function(set_name) {
   features <- get_features()
 
   x_file <- file.path(dataset_dir, get_data_file_name('x'))
-  x_data <- read.fwf(x_file, rep(16, length(features)), col.names=features, colClasses='numeric', n=5)
+  x_data <- read.fwf(x_file, rep(16, length(features)), col.names=features, colClasses='numeric', n=nrows)
   x_data <- tbl_df(x_data)
   x_data <- select(x_data, contains('mean'), contains('std'))
   
   y_file <- file.path(dataset_dir, get_data_file_name('y'))
-  y_data <- read.table(y_file, colClasses='numeric', col.names=c('activity'), nrows=5)
+  y_data <- read.table(y_file, colClasses='numeric', col.names=c('activity'), nrows=nrows)
   y_data <- tbl_df(y_data)
   y_data <- transmute(y_data, activity=activities[activity])
   
-  bind_cols(y_data, x_data)
+  bind_cols(subject_data, y_data, x_data)
 }
 
-activities <- get_activities()
-features <- get_features()
+test_data <- load_data_set('test', 20)
+train_data <- load_data_set('train', 20)
 
-train_data <- load_data_set('train')
+all_data <- bind_rows(test_data, train_data)
