@@ -12,7 +12,19 @@ get_activities <- function() {
 get_features <- function() {
   features_file <- file.path(data_dir, 'features.txt')
   features_data <- read.csv(features_file, header=FALSE, sep=' ', stringsAsFactors = FALSE)
-  matrix(features_data[,2])
+  features <- matrix(features_data[,2])
+  apply(features, 2, clean_feature_name)
+}
+
+is_mean_or_std <- function(feature) {
+  matches <- grep('(mean|std)\\(\\)', feature)
+  length(matches) > 0
+}
+
+clean_feature_name <- function(feature) {
+  no_lparens <- gsub('\\(', '', feature)
+  no_rparens <- gsub('\\)', '', no_lparens)
+  chartr('-,', '..', no_rparens)
 }
 
 load_data_set <- function(set_name) {
@@ -27,12 +39,20 @@ load_data_set <- function(set_name) {
   subject_data <- tbl_df(subject_data)
   colnames(subject_data) <- c('subject')
 
+  activities <- get_activities()
   features <- get_features()
 
   x_file <- file.path(dataset_dir, get_data_file_name('x'))
-  x_data <- read.fwf(x_file, rep(16, length(features)), col.names=features, colClasses=c('numeric'), n=50)
+  x_data <- read.fwf(x_file, rep(16, length(features)), col.names=features, colClasses='numeric', n=5)
   x_data <- tbl_df(x_data)
-  x_data
+  x_data <- select(x_data, contains('mean'), contains('std'))
+  
+  y_file <- file.path(dataset_dir, get_data_file_name('y'))
+  y_data <- read.table(y_file, colClasses='numeric', col.names=c('activity'), nrows=5)
+  y_data <- tbl_df(y_data)
+  y_data <- transmute(y_data, activity=activities[activity])
+  
+  bind_cols(y_data, x_data)
 }
 
 activities <- get_activities()
