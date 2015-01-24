@@ -51,11 +51,24 @@ load_data_set <- function(set_name, nrows=-1) {
   y_data <- read.table(y_file, colClasses='numeric', col.names=c('activity'), nrows=nrows)
   y_data <- tbl_df(y_data)
   y_data <- transmute(y_data, activity=activities[activity])
-  
+
   bind_cols(subject_data, y_data, x_data)
 }
 
-test_data <- load_data_set('test', 20)
-train_data <- load_data_set('train', 20)
+create_combined_dataset <- function(nrows=-1) {
+  test_data <- load_data_set('test', nrows=nrows)
+  train_data <- load_data_set('train', nrows=nrows)
+  dataset <- bind_rows(test_data, train_data)
+  arrange(dataset, subject, activity)
+}
 
-all_data <- bind_rows(test_data, train_data)
+save_combined_dataset <- function(dataset) {
+  combined_file <- file.path('combined.txt')
+  write.table(dataset, combined_file)
+}
+
+read_combined_dataset <- function() {
+  combined_file <- file.path('combined.txt')
+  dataset <- read.table(combined_file)
+  tbl_df(dataset)
+}
