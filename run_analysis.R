@@ -89,7 +89,7 @@ create_tidy_dataset <- function(dataset) {
 
 save_tidy_dataset <- function(dataset) {
   tidy_file <- file.path('tidy.txt')
-  write.table(dataset, tidy_file)
+  write.table(dataset, tidy_file, row.names=FALSE)
 }
 
 read_tidy_dataset <- function(dataset) {
