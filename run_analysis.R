@@ -1,5 +1,6 @@
 # Clean the Smartphone data
 library(dplyr)
+library(lazyeval)
 
 data_dir <- 'UCI HAR Dataset'
 
@@ -71,4 +72,17 @@ read_combined_dataset <- function() {
   combined_file <- file.path('combined.txt')
   dataset <- read.table(combined_file)
   tbl_df(dataset)
+}
+
+create_tidy_dataset <- function(dataset) {
+  columns <- colnames(dataset)
+  columns <- columns[3:length(columns)]
+
+  mean_expression <- function(column) {
+    interp(quote(mean(var)), var=as.name(column))
+  }
+  
+  dots <- lapply(columns, mean_expression)
+
+  summarise_(dataset, .dots = dots)
 }
