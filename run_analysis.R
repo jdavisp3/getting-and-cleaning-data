@@ -86,3 +86,8 @@ create_tidy_dataset <- function(dataset) {
 
   summarise_(dataset, .dots = dots)
 }
+
+save_tidy_dataset <- function(dataset) {
+  tidy_file <- file.path('tidy.txt')
+  write.table(dataset, tidy_file)
+}
