@@ -94,5 +94,5 @@ save_tidy_dataset <- function(dataset) {
 
 read_tidy_dataset <- function(dataset) {
   tidy_file <- file.path('tidy.txt')
-  tbl_df(read.table(tidy_file))
+  tbl_df(read.table(tidy_file, header=TRUE, row.names=NULL))
 }
