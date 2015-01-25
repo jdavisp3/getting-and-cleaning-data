@@ -84,7 +84,7 @@ create_tidy_dataset <- function(dataset) {
   
   dots <- lapply(columns, mean_expression)
 
-  summarise_(dataset, .dots = dots)
+  summarise_(group_by(dataset, subject, activity), .dots = dots)
 }
 
 save_tidy_dataset <- function(dataset) {
